@@ -1,0 +1,6 @@
+fastapi
+numpy
+pandas
+python-dateutil
+tqdm
+uvicorn

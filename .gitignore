@@ -1,0 +1,5 @@
+certificates
+docker-compose.yml
+services/backend/certificates
+*.pyc
+__pycache__

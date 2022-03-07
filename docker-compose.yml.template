@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: ./services/data-backend/Dockerfile
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    environment:
+      DATA_SECRET_KEY:
+      EIKON_SECRET_KEY:
+      EIKON_URL: https://eikon.opencta.com
+      MINIO_ROOT_PASSWORD:
+      MINIO_ROOT_USER:
+    depends_on:
+      - "minio"
+
+  minio:
+    build:
+      context: .
+      dockerfile: ./services/minio/Dockerfile
+    command: server /data --console-address :9001
+    environment:
+      MINIO_DOMAIN: data.opencta.com
+      MINIO_ROOT_PASSWORD:
+      MINIO_ROOT_USER:
+    expose:
+      - "9000"
+      - "9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: always
+    volumes:
+      - ../volumes/minio:/data
