@@ -5,16 +5,16 @@ from fastapi import FastAPI, HTTPException, Depends, Request
 
 from common.data.constants import FUTURES
 import numpy as np
-from .utils.downloaders.factor_carry_bond import factor_carry_bond
-from .utils.downloaders.factor_carry_commodity import factor_carry_commodity
-from .utils.downloaders.factor_carry_currency import factor_carry_currency
-from .utils.downloaders.factor_carry_equity import factor_carry_equity
-from .utils.downloaders.factor_cot import factor_cot
-from .utils.downloaders.factor_currency import factor_currency
-from .utils.downloaders.factor_roll_return import factor_roll_return
-from .utils.downloaders.nav import nav_long, nav_short
-from .utils.downloaders.ohlcv import ohlcv
-from .utils.downloaders.splits import splits
+from .downloaders.factor_carry_bond import factor_carry_bond
+from .downloaders.factor_carry_commodity import factor_carry_commodity
+from .downloaders.factor_carry_currency import factor_carry_currency
+from .downloaders.factor_carry_equity import factor_carry_equity
+from .downloaders.factor_cot import factor_cot
+from .downloaders.factor_currency import factor_currency
+from .downloaders.factor_roll_return import factor_roll_return
+from .downloaders.nav import nav_long, nav_short
+from .downloaders.ohlcv import ohlcv
+from .downloaders.splits import splits
 
 
 DATA_SECRET_KEY = os.getenv('DATA_SECRET_KEY')
