@@ -3,18 +3,18 @@ services:
 
   backend:
     build:
-      context: ../..
-      dockerfile: ./services/data-backend/Dockerfile
+      context: .
+      dockerfile: ./services/backend/Dockerfile
     expose:
       - "80"
     ports:
       - "80:80"
     environment:
-      DATA_SECRET_KEY:
-      EIKON_SECRET_KEY:
-      EIKON_URL: https://eikon.opencta.com
-      MINIO_ROOT_PASSWORD:
-      MINIO_ROOT_USER:
+      DATA_SECRET_KEY: {{ DATA_SECRET_KEY }}
+      EIKON_SECRET_KEY: {{ EIKON_SECRET_KEY }}
+      EIKON_URL: {{ EIKON_URL }}
+      MINIO_ROOT_PASSWORD: {{ MINIO_ROOT_PASSWORD }}
+      MINIO_ROOT_USER: {{ MINIO_ROOT_USER }}
     depends_on:
       - "minio"
 
@@ -24,9 +24,9 @@ services:
       dockerfile: ./services/minio/Dockerfile
     command: server /data --console-address :9001
     environment:
-      MINIO_DOMAIN: data.opencta.com
-      MINIO_ROOT_PASSWORD:
-      MINIO_ROOT_USER:
+      MINIO_DOMAIN: {{ MINIO_DOMAIN }}
+      MINIO_ROOT_PASSWORD: {{ MINIO_ROOT_PASSWORD }}
+      MINIO_ROOT_USER: {{ MINIO_ROOT_USER }}
     expose:
       - "9000"
       - "9001"

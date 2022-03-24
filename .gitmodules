@@ -1,0 +1,3 @@
+[submodule "services/backend/app/common"]
+	path = services/backend/app/common
+	url = https://github.com/OpenCTA-com/common
