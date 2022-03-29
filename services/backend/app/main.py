@@ -1,4 +1,5 @@
 from datetime import datetime
+from distutils.log import error
 import os
 
 from fastapi import FastAPI, HTTPException, Depends, Request
@@ -43,11 +44,13 @@ def verify_token(req: Request):
 
 @catch_errors
 def factor_carry_bond(ticker:str, start_date:str, end_date:str):
-    dfm = factor_carry_bond(
+    dfm, error_message = factor_carry_bond(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/factor/carry/bond')
@@ -58,11 +61,13 @@ def handler_daily_factor_carry_bond(ticker:str, start_date:str, end_date:str,
 
 @catch_errors
 def daily_factor_carry_commodity(ticker:str, start_date:str, end_date:str):
-    dfm = factor_carry_commodity(
+    dfm, error_message = factor_carry_commodity(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/factor/carry/commodity')
@@ -73,11 +78,13 @@ def handler_daily_factor_carry_commodity(ticker:str, start_date:str, end_date:st
 
 @catch_errors
 def daily_factor_carry_currency(ticker:str, start_date:str, end_date:str):
-    dfm = factor_carry_currency(
+    dfm, error_message = factor_carry_currency(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/factor/carry/currency')
@@ -88,11 +95,13 @@ def handler_daily_factor_carry_currency(ticker:str, start_date:str, end_date:str
 
 @catch_errors
 def daily_factor_carry_equity(ticker:str, start_date:str, end_date:str):
-    dfm = factor_carry_equity(
+    dfm, error_message = factor_carry_equity(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/factor/carry/equity')
@@ -103,11 +112,13 @@ def handler_daily_factor_carry_equity(ticker:str, start_date:str, end_date:str,
 
 @catch_errors
 def daily_factor_cot(ticker:str, start_date:str, end_date:str):
-    dfm = factor_cot(
+    dfm, error_message = factor_cot(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/factor/cot')
@@ -118,12 +129,14 @@ def handler_daily_factor_cot(ticker:str, start_date:str, end_date:str,
 
 @catch_errors
 def daily_factor_currency(ticker:str, start_date:str, end_date:str):
-    dfm = factor_currency(
+    dfm, error_message = factor_currency(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
     dfm.reset_index(inplace=True)
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/factor/currency')
@@ -133,12 +146,14 @@ def handler_daily_factor_currency(ticker:str, start_date:str, end_date:str, auth
 
 @catch_errors
 def daily_factor_roll_return(ticker:str, start_date:str, end_date:str):
-    dfm = factor_roll_return(
+    dfm, error_message = factor_roll_return(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
     dfm.reset_index(inplace=True)
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/factor/roll-return')
@@ -150,32 +165,38 @@ def handler_daily_factor_roll_return(ticker:str, start_date:str, end_date:str,
 @app.get('/daily/nav/long')
 def handler_daily_nav_long(ticker:str, start_date:str, end_date:str, 
         authorized:bool = Depends(verify_token)):
-    dfm = nav_long(
+    dfm, error_message = nav_long(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
     dfm.reset_index(inplace=True)
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/nav/short')
 def handler_daily_nav_short(ticker:str, start_date:str, end_date:str, 
         authorized:bool = Depends(verify_token)):
-    dfm = nav_short(
+    dfm, error_message = nav_short(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
     dfm.reset_index(inplace=True)
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @catch_errors
 def daily_ohlcv(ticker:str, start_date:str, end_date:str):
-    dfm = ohlcv(
+    dfm, error_message = ohlcv(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 @app.get('/daily/ohlcv')
 def handler_daily_ohlcv(ticker:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
@@ -184,11 +205,13 @@ def handler_daily_ohlcv(ticker:str, start_date:str, end_date:str, authorized:boo
 
 @catch_errors
 def daily_splits(ticker:str, start_date:str, end_date:str):
-    dfm = splits(
+    dfm, error_message = splits(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    return { 'data': dfm.reset_index().replace({np.nan: None}).to_dict(orient='records'), 'error': None }
+    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
 
 
 @app.get('/daily/splits')

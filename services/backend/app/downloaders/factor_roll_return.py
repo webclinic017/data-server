@@ -25,4 +25,4 @@ def factor_roll_return(future, start_date, end_date):
     dfm = safe_concat(frames, axis=1)
     dfm = dfm.mean(axis=1).to_frame()
     dfm.columns = ['RollReturn']
-    return dfm
+    return dfm, None

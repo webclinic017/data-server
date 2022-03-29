@@ -19,4 +19,4 @@ def factor_carry_bond(future, start_date, end_date):
     dfm['CarryFactor'] = np.power(1 + dfm.CLOSE_10 / 100, 10) / (
         np.power(1 + dfm.CLOSE_rfr / 100, 5) *
         np.power(1 + dfm.CLOSE_5 / 100, 5)) - 1
-    return dfm[['CarryFactor']]
+    return dfm[['CarryFactor']], None

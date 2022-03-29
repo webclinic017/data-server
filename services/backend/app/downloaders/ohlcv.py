@@ -13,9 +13,9 @@ def ohlcv__raw(ric, start_date, end_date):
 def ohlcv(future, start_date, end_date):
     stem = future['Stem']['Reuters']
     ric = stem_to_ric(stem, 'c1')
-    dfm = ohlcv__raw(ric, start_date, end_date)
+    dfm, error_message = ohlcv__raw(ric, start_date, end_date)
     if dfm is None:
-        return
+        return None, error_message
     dfm = dfm[['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME']]
     dfm = dfm.rename(columns={
         'OPEN': 'Open',
@@ -26,4 +26,4 @@ def ohlcv(future, start_date, end_date):
     arrays = [dfm.index, [stem] * len(dfm)]
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
-    return dfm
+    return dfm, None

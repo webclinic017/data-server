@@ -15,4 +15,4 @@ def factor_carry_commodity(future, start_date, end_date):
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
     dfm['CarryFactor'] = dfm.CLOSE_c2 / dfm.CLOSE_c1 - 1
-    return dfm[['CarryFactor']]
+    return dfm[['CarryFactor']], None

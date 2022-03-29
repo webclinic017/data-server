@@ -20,9 +20,9 @@ def dividend__raw(ric, start_date, end_date):
 def dividend(future, start_date, end_date):
     stem = future['Stem']['Reuters']
     ric = future['CarryFactor']['ExpectedDividend']
-    dfm = dividend__raw(ric, start_date, end_date)
+    dfm, error_message = dividend__raw(ric, start_date, end_date)
     if dfm is None:
-        return
+        return None, error_message
     not_null_dates = dfm.index.map(lambda x: not pd.isnull(x))
     dfm = dfm.loc[not_null_dates, :]
     dfm.index = pd.to_datetime(dfm.index, format='%Y-%m-%d')
@@ -32,7 +32,7 @@ def dividend(future, start_date, end_date):
     column_name = 'Calculated Index Dividend Yield'
     dfm = dfm[[column_name]].rename(columns={column_name: 'DividendYield'})
     dfm.index.map(lambda x: np.isnan([0]))
-    return dfm
+    return dfm, None
 
 
 def risk_free_rate(future, start_date, end_date):

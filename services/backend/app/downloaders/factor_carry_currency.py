@@ -11,4 +11,4 @@ def factor_carry_currency(future, start_date, end_date):
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
     dfm = dfm[['CLOSE']].rename(columns={'CLOSE': 'CarryFactor'}) / 100
-    return dfm
+    return dfm, None

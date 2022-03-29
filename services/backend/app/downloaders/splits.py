@@ -45,4 +45,4 @@ def splits(future, start_date, end_date):
         number_of_months_since_previous_change += 1
         if number_of_months_since_previous_change > minimum_number_of_months_between_sets:
             dfm.loc[index, column] = sequence[sequence_index]
-    return dfm
+    return dfm, None

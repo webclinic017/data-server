@@ -13,4 +13,4 @@ def factor_currency(future, start_date, end_date):
     arrays = [dfm.index, [stem] * len(dfm)]
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
-    return dfm
+    return dfm, None

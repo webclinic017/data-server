@@ -20,7 +20,7 @@ def nav_long(future, start_date, end_date):
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
     dfm = dfm.rename(columns={'Nav': 'NavLong'})
-    return dfm
+    return dfm, None
 
 
 def nav_short(future, start_date, end_date):
@@ -39,4 +39,4 @@ def nav_short(future, start_date, end_date):
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
     dfm = dfm.rename(columns={'Nav': 'NavShort'})
-    return dfm
+    return dfm, None
