@@ -7,11 +7,20 @@ import pandas as pd
 
 def factor_carry_bond(future, start_date, end_date):
     stem = future['Stem']['Reuters']
-    dfm_5 = ohlcv__raw(
-        future['CarryFactor']['GovernmentInterestRate5Y'], start_date, end_date).add_suffix('_5')
-    dfm_10 = ohlcv__raw(
-        future['CarryFactor']['GovernmentInterestRate10Y'], start_date, end_date).add_suffix('_10')
-    dfm_rfr = ohlcv__raw('US3MT=RR', start_date, end_date).add_suffix('_rfr')
+    dfm_5, error_message = ohlcv__raw(
+        future['CarryFactor']['GovernmentInterestRate5Y'], start_date, end_date)
+    if error_message is not None:
+        return None, error_message
+    dfm_5 = dfm_5.add_suffix('_5')
+    dfm_10, error_message = ohlcv__raw(
+        future['CarryFactor']['GovernmentInterestRate10Y'], start_date, end_date)
+    if error_message is not None:
+        return None, error_message
+    dfm_10 = dfm_10.add_suffix('_10')
+    dfm_rfr, error_message = ohlcv__raw('US3MT=RR', start_date, end_date)
+    if error_message is not None:
+        return None, error_message
+    dfm_rfr = dfm_rfr.add_suffix('_rfr')
     dfm = safe_concat([dfm_5, dfm_10, dfm_rfr], axis=1)
     arrays = [dfm.index, [stem] * len(dfm)]
     tuples = list(zip(*arrays))

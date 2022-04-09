@@ -4,7 +4,9 @@ import pandas as pd
 
 def factor_currency(future, start_date, end_date):
     ric = future['CurrencyFactor']
-    dfm = ohlcv__raw(ric, start_date, end_date)
+    dfm, error_message = ohlcv__raw(ric, start_date, end_date)
+    if error_message is not None:
+        return None, error_message
     dfm = dfm[['CLOSE']]
     if ric.startswith('USD'):
         dfm.CLOSE = 1 / dfm.CLOSE

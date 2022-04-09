@@ -10,7 +10,9 @@ def business_conditions(future, start_date, end_date):
     stem = future['Stem']['Reuters']
     window_long = 200
     window_short = 50
-    dfm = ohlcv__raw('.SPX', start_date, end_date)
+    dfm, error_message = ohlcv__raw('.SPX', start_date, end_date)
+    if error_message is not None:
+        return None, error_message
     arrays = [dfm.index, [stem] * len(dfm)]
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])

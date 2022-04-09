@@ -5,7 +5,9 @@ import pandas as pd
 
 def factor_carry_currency(future, start_date, end_date):
     ric = future['CarryFactor']['LocalInterestRate']
-    dfm = ohlcv__raw(ric, start_date, end_date)
+    dfm, error_message = ohlcv__raw(ric, start_date, end_date)
+    if error_message is not None:
+        return None, error_message
     stem = future['Stem']['Reuters']
     arrays = [dfm.index, [stem] * len(dfm)]
     tuples = list(zip(*arrays))

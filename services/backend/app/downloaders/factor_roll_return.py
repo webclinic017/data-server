@@ -9,10 +9,14 @@ def factor_roll_return(future, start_date, end_date):
     for i in range(5):
         suffix = f'c{i+1}'
         ric = stem_to_ric(stem, suffix)
-        dfm = ohlcv__raw(ric, start_date, end_date)
+        dfm, error_message = ohlcv__raw(ric, start_date, end_date)
+        if dfm is None:
+            continue
         dfms_dict[suffix] = dfm
     frames = []
     for i in range(4):
+        if f'c{i+1}' not in dfms_dict or f'c{i+2}' not in dfms_dict:
+            continue
         dfm_1 = dfms_dict[f'c{i+1}'].add_suffix('_1')
         dfm_2 = dfms_dict[f'c{i+2}'].add_suffix('_2')
         dfm = safe_concat([dfm_1, dfm_2], axis=1)
@@ -22,6 +26,8 @@ def factor_roll_return(future, start_date, end_date):
         tuples = list(zip(*arrays))
         dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
         frames.append(dfm)
+    if dfm.shape[1] < 1:
+        return None, 'Not enough data'
     dfm = safe_concat(frames, axis=1)
     dfm = dfm.mean(axis=1).to_frame()
     dfm.columns = ['RollReturn']

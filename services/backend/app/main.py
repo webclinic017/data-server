@@ -43,12 +43,14 @@ def verify_token(req: Request):
 
 
 @catch_errors
-def factor_carry_bond(ticker:str, start_date:str, end_date:str):
+def daily_factor_carry_bond(ticker:str, start_date:str, end_date:str):
     dfm, error_message = factor_carry_bond(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -56,7 +58,7 @@ def factor_carry_bond(ticker:str, start_date:str, end_date:str):
 @app.get('/daily/factor/carry/bond')
 def handler_daily_factor_carry_bond(ticker:str, start_date:str, end_date:str, 
         authorized:bool = Depends(verify_token)):
-    return factor_carry_bond(ticker, start_date, end_date)
+    return daily_factor_carry_bond(ticker, start_date, end_date)
     
 
 @catch_errors
@@ -65,7 +67,9 @@ def daily_factor_carry_commodity(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -82,7 +86,9 @@ def daily_factor_carry_currency(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -99,7 +105,9 @@ def daily_factor_carry_equity(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -116,7 +124,9 @@ def daily_factor_cot(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -133,8 +143,9 @@ def daily_factor_currency(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    dfm.reset_index(inplace=True)
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -150,8 +161,9 @@ def daily_factor_roll_return(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    dfm.reset_index(inplace=True)
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -169,8 +181,9 @@ def handler_daily_nav_long(ticker:str, start_date:str, end_date:str,
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    dfm.reset_index(inplace=True)
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -182,8 +195,9 @@ def handler_daily_nav_short(ticker:str, start_date:str, end_date:str,
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    dfm.reset_index(inplace=True)
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -194,7 +208,9 @@ def daily_ohlcv(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
@@ -209,7 +225,9 @@ def daily_splits(ticker:str, start_date:str, end_date:str):
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index().replace({np.nan: None}).to_dict(orient='records') \
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
 
