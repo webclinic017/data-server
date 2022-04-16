@@ -23,7 +23,7 @@ def business_conditions(future, start_date, end_date):
     return dfm[[column]]
 
 
-def splits(future, start_date, end_date):
+def factor_splits(future, start_date, end_date):
     """
     """
     column = 'TrainingSets'

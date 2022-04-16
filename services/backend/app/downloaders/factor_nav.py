@@ -1,10 +1,10 @@
 import pandas as pd
 
-from common.strategies.buy_and_hold.models.backtester import BuyAndHoldBacktester
-from common.strategies.sell_and_hold.models.backtester import SellAndHoldBacktester
+from ..common.strategies.buy_and_hold.models.backtester import BuyAndHoldBacktester
+from ..common.strategies.sell_and_hold.models.backtester import SellAndHoldBacktester
 
 
-def nav_long(future, start_date, end_date):
+def factor_nav_long(future, start_date, end_date):
     stem = future['Stem']['Reuters']
     stems = [stem]
     cash = 1000000
@@ -23,7 +23,7 @@ def nav_long(future, start_date, end_date):
     return dfm, None
 
 
-def nav_short(future, start_date, end_date):
+def factor_nav_short(future, start_date, end_date):
     stem = future['Stem']['Reuters']
     stems = [stem]
     cash = 1000000

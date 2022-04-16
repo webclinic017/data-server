@@ -1,6 +1,6 @@
-from common.data.database import json_data_to_df
-from common.data.eikon import get_timeseries
-from .utils import cache_in_s3, stem_to_ric
+from ..common.data.database import json_data_to_df
+from ..common.data.eikon import get_timeseries
+from .utils import cache_in_s3
 import pandas as pd
 
 
@@ -10,9 +10,7 @@ def ohlcv__raw(ric, start_date, end_date):
         ric, start_date=start_date.isoformat(), end_date=end_date.isoformat())
 
 
-def ohlcv(future, start_date, end_date):
-    stem = future['Stem']['Reuters']
-    ric = stem_to_ric(stem, 'c1')
+def ohlcv(ric, start_date, end_date):
     dfm, error_message = ohlcv__raw(ric, start_date, end_date)
     if error_message is not None:
         return None, error_message
@@ -23,7 +21,7 @@ def ohlcv(future, start_date, end_date):
         'LOW': 'Low',
         'CLOSE': 'Close',
         'VOLUME': 'Volume'})
-    arrays = [dfm.index, [stem] * len(dfm)]
+    arrays = [dfm.index, [ric] * len(dfm)]
     tuples = list(zip(*arrays))
-    dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'Stem'])
+    dfm.index = pd.MultiIndex.from_tuples(tuples, names=['Date', 'RIC'])
     return dfm, None

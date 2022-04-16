@@ -5,16 +5,16 @@ import json
 import os
 import tempfile
 
-from common.data.database import download_from_s3
-from common.data.minio_client import exists_object, make_bucket_if_not_exists, put_object, stat_object
-from common.utils.files import ensure_dir
+from ..common.data.database import download_from_s3
+from ..common.data.minio_client import exists_object, make_bucket_if_not_exists, put_object, stat_object
+from ..common.utils.files import ensure_dir
 import pandas as pd
 from tqdm import tqdm
 
 
 EIKON_NOT_RUNNING = 'Eikon not running'
 TOO_MANY_REQUESTS = 'Too many requests'
-FUNCTIONS_RETURNING_STRING_INDEX = ['dividend__raw']
+FUNCTIONS_RETURNING_STRING_INDEX = ['dividend__raw', 'risk_free_rate__raw']
 
 
 def safe_concat(frames, axis=0):
@@ -101,6 +101,7 @@ def cache_in_s3(bucket_name, json_data_to_df):
                 dfm.index = pd.to_datetime(dfm.index, format='%Y-%m-%d')
             index = (dfm.index >= start_date) & (dfm.index <= end_date)
             dfm = dfm.loc[index, :]
+            dfm.drop_duplicates(keep=False,inplace=True)
             return dfm, None
         return inner
     return decorator

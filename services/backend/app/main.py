@@ -1,10 +1,10 @@
 from datetime import datetime
-from distutils.log import error
 import os
 
 from fastapi import FastAPI, HTTPException, Depends, Request
 
-from common.data.constants import FUTURES
+from .common.constants import FUTURES
+from .common.data.eikon import get_data
 import numpy as np
 from .downloaders.factor_carry_bond import factor_carry_bond
 from .downloaders.factor_carry_commodity import factor_carry_commodity
@@ -12,10 +12,11 @@ from .downloaders.factor_carry_currency import factor_carry_currency
 from .downloaders.factor_carry_equity import factor_carry_equity
 from .downloaders.factor_cot import factor_cot
 from .downloaders.factor_currency import factor_currency
+from .downloaders.factor_nav import factor_nav_long, factor_nav_short
 from .downloaders.factor_roll_return import factor_roll_return
-from .downloaders.nav import nav_long, nav_short
+from .downloaders.risk_free_rate import risk_free_rate
+from .downloaders.factor_splits import factor_splits
 from .downloaders.ohlcv import ohlcv
-from .downloaders.splits import splits
 
 
 DATA_SECRET_KEY = os.getenv('DATA_SECRET_KEY')
@@ -155,6 +156,46 @@ def handler_daily_factor_currency(ticker:str, start_date:str, end_date:str, auth
     return daily_factor_currency(ticker, start_date, end_date)
 
 
+@app.get('/daily/factor/nav/long')
+def handler_daily_factor_nav_long(ticker:str, start_date:str, end_date:str, 
+        authorized:bool = Depends(verify_token)):
+    dfm, error_message = factor_nav_long(
+        future=FUTURES.get(ticker),
+        start_date=datetime.strptime(start_date, '%Y-%m-%d'),
+        end_date=datetime.strptime(end_date, '%Y-%m-%d'))
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
+
+
+@app.get('/daily/factor/nav/short')
+def handler_daily_factor_nav_short(ticker:str, start_date:str, end_date:str, 
+        authorized:bool = Depends(verify_token)):
+    dfm, error_message = factor_nav_short(
+        future=FUTURES.get(ticker),
+        start_date=datetime.strptime(start_date, '%Y-%m-%d'),
+        end_date=datetime.strptime(end_date, '%Y-%m-%d'))
+    data = dfm.reset_index() \
+        .replace({np.inf: np.nan}).replace({np.nan: None}) \
+        .to_dict(orient='records') \
+        if error_message is None else None
+    return { 'data': data, 'error': error_message }
+
+
+@app.get('/daily/factor/news/headlines')
+def handler_daily_factor_news_headlines(
+        ticker:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
+    return { 'data': None, 'error': None }
+
+
+@app.get('/daily/factor/news/stories')
+def handler_daily_factor_news_headlines(
+        ticker:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
+    return { 'data': None, 'error': None }
+
+
 @catch_errors
 def daily_factor_roll_return(ticker:str, start_date:str, end_date:str):
     dfm, error_message = factor_roll_return(
@@ -174,10 +215,9 @@ def handler_daily_factor_roll_return(ticker:str, start_date:str, end_date:str,
     return daily_factor_roll_return(ticker, start_date, end_date)
 
 
-@app.get('/daily/nav/long')
-def handler_daily_nav_long(ticker:str, start_date:str, end_date:str, 
-        authorized:bool = Depends(verify_token)):
-    dfm, error_message = nav_long(
+@catch_errors
+def daily_factor_splits(ticker:str, start_date:str, end_date:str):
+    dfm, error_message = factor_splits(
         future=FUTURES.get(ticker),
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
@@ -188,24 +228,14 @@ def handler_daily_nav_long(ticker:str, start_date:str, end_date:str,
     return { 'data': data, 'error': error_message }
 
 
-@app.get('/daily/nav/short')
-def handler_daily_nav_short(ticker:str, start_date:str, end_date:str, 
-        authorized:bool = Depends(verify_token)):
-    dfm, error_message = nav_short(
-        future=FUTURES.get(ticker),
-        start_date=datetime.strptime(start_date, '%Y-%m-%d'),
-        end_date=datetime.strptime(end_date, '%Y-%m-%d'))
-    data = dfm.reset_index() \
-        .replace({np.inf: np.nan}).replace({np.nan: None}) \
-        .to_dict(orient='records') \
-        if error_message is None else None
-    return { 'data': data, 'error': error_message }
-
+@app.get('/daily/factor/splits')
+def handler_daily_splits(ticker:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
+    return daily_factor_splits(ticker, start_date, end_date)
 
 @catch_errors
-def daily_ohlcv(ticker:str, start_date:str, end_date:str):
+def daily_ohlcv(ric:str, start_date:str, end_date:str):
     dfm, error_message = ohlcv(
-        future=FUTURES.get(ticker),
+        ric=ric,
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
     data = dfm.reset_index() \
@@ -213,16 +243,17 @@ def daily_ohlcv(ticker:str, start_date:str, end_date:str):
         .to_dict(orient='records') \
         if error_message is None else None
     return { 'data': data, 'error': error_message }
+
 
 @app.get('/daily/ohlcv')
-def handler_daily_ohlcv(ticker:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
-    return daily_ohlcv(ticker, start_date, end_date)
+def handler_daily_ohlcv(ric:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
+    return daily_ohlcv(ric, start_date, end_date)
 
 
-@catch_errors
-def daily_splits(ticker:str, start_date:str, end_date:str):
-    dfm, error_message = splits(
-        future=FUTURES.get(ticker),
+#@catch_errors
+def daily_risk_free_rate(ric:str, start_date:str, end_date:str):
+    dfm, error_message = risk_free_rate(
+        ric=ric,
         start_date=datetime.strptime(start_date, '%Y-%m-%d'),
         end_date=datetime.strptime(end_date, '%Y-%m-%d'))
     data = dfm.reset_index() \
@@ -232,14 +263,25 @@ def daily_splits(ticker:str, start_date:str, end_date:str):
     return { 'data': data, 'error': error_message }
 
 
-@app.get('/daily/splits')
-def handler_daily_splits(ticker:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
-    return daily_splits(ticker, start_date, end_date)
+@app.get('/daily/risk-free-rate')
+def handler_daily_risk_free_rate(ric:str, start_date:str, end_date:str, authorized:bool = Depends(verify_token)):
+    return daily_risk_free_rate(ric, start_date, end_date)
 
 
 @app.get('/health')
 def handler_health():
     return { 'data': 'OK', 'error': None }
+
+
+@app.get('/health/ric')
+def handler_health_ric(ric:str, authorized:bool = Depends(verify_token)):
+    r = get_data(instruments=[ric], fields=['TR.RIC', 'CF_NAME'])
+    ric_exists = False
+    try:
+        ric_exists = r['data'][0]['RIC'] is not None
+    except:
+        pass
+    return { 'data': ric_exists, 'error': None }
 
 
 @app.get('/tickers')

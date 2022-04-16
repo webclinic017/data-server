@@ -1,4 +1,4 @@
-from common.data.cot import get_commitment_of_traders
+from ..common.data.cot import get_commitment_of_traders
 import pandas as pd
 
 

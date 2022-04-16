@@ -1,6 +1,6 @@
 
-from common.data.database import json_data_to_df
-from common.data.eikon import get_data
+from ..common.data.database import json_data_to_df
+from ..common.data.eikon import get_data
 from .ohlcv import ohlcv__raw
 from .utils import safe_concat, cache_in_s3
 import numpy as np
