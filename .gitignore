@@ -3,5 +3,4 @@ docker-compose.yml
 google_secret.json
 services/backend/certificates
 *.pyc
-.vscode
 __pycache__

@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Depends, Request
 import numpy as np
 
 from .fetchers.common.constants import FUTURES
-from .fetchers.common.eikon import get_data
+from .fetchers.expiry_calendar import expiry_calendar
 from .fetchers.factors.carry_bond import factor_carry_bond
 from .fetchers.factors.carry_commodity import factor_carry_commodity
 from .fetchers.factors.carry_currency import factor_carry_currency
@@ -15,6 +15,7 @@ from .fetchers.factors.currency import factor_currency
 from .fetchers.factors.nav import factor_nav_long, factor_nav_short
 from .fetchers.factors.roll_return import factor_roll_return
 from .fetchers.factors.splits import factor_splits
+from .fetchers.health_ric import health_ric
 from .fetchers.ohlcv import ohlcv
 from .fetchers.risk_free_rate import risk_free_rate
 
@@ -356,7 +357,7 @@ def handler_daily_ohlcv(
     return daily_ohlcv(ric, start_date, end_date)
 
 
-# @catch_errors
+@catch_errors
 def daily_risk_free_rate(ric: str, start_date: str, end_date: str):
     dfm, error_message = risk_free_rate(
         ric=ric,
@@ -381,6 +382,28 @@ def handler_daily_risk_free_rate(
     return daily_risk_free_rate(ric, start_date, end_date)
 
 
+@app.get("/daily/risk-free-rate")
+def handler_daily_risk_free_rate(
+    ric: str, start_date: str, end_date: str, authorized: bool = Depends(verify_token)
+):
+    return daily_risk_free_rate(ric, start_date, end_date)
+
+
+@app.get("/expiry-calendar")
+def handler_expiry_calendar(
+    ticker: str,
+    start_date: str,
+    end_date: str,
+    authorized: bool = Depends(verify_token),
+):
+    data, error_message = expiry_calendar(
+        ticker=ticker,
+        start_date=datetime.strptime(start_date, "%Y-%m-%d"),
+        end_date=datetime.strptime(end_date, "%Y-%m-%d"),
+    )
+    return {"data": data, "error": error_message}
+
+
 @app.get("/health")
 def handler_health():
     return {"data": "OK", "error": None}
@@ -388,13 +411,7 @@ def handler_health():
 
 @app.get("/health/ric")
 def handler_health_ric(ric: str, authorized: bool = Depends(verify_token)):
-    r = get_data(instruments=[ric], fields=["TR.RIC", "CF_NAME"])
-    ric_exists = False
-    try:
-        ric_exists = r["data"][0]["RIC"] is not None
-    except:
-        pass
-    return {"data": ric_exists, "error": None}
+    return health_ric(ric)
 
 
 @app.get("/tickers")

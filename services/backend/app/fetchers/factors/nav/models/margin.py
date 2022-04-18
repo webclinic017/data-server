@@ -25,7 +25,7 @@ class Margin:
         ref_date = self.get_ref_date(stem)
         _, ref_ric = get_front_contract(stem=stem, day=ref_date)
         row_ref = self.market_data.bardata(ric=ref_ric, day=ref_date)
-        self.cache[key] = row["CLOSE"][0] / row_ref["CLOSE"][0]
+        self.cache[key] = row["Close"][0] / row_ref["Close"][0]
         return self.cache[key]
 
     def get_ref_date(self, stem):
@@ -33,12 +33,6 @@ class Margin:
             return date(2021, 8, 18)
         default_ref_date = date(2020, 1, 6)
         return default_ref_date
-
-    def overnight_coin(self, ric, day):
-        if not self.market_data.is_trading_day(day, ric):
-            return 0
-        row = self.market_data.bardata(day, ric)
-        return row["CLOSE"][0]
 
     def overnight_initial_future(self, stem, day):
         currency = FUTURES[stem]["Currency"]
@@ -48,13 +42,6 @@ class Margin:
             * self.forex.to_usd(currency, day)
         )
 
-    def overnight_initial_stock(self, ric, day):
-        currency = self.forex.get_stock_currency(ric)
-        if not self.market_data.is_trading_day(day, ric):
-            return 0
-        row = self.market_data.bardata(day, ric)
-        return row["CLOSE"][0] / 2 * self.forex.to_usd(currency, day)
-
     def overnight_maintenance_future(self, stem, day):
         currency = FUTURES[stem]["Currency"]
         return (
@@ -62,13 +49,6 @@ class Margin:
             * self.adjustment_factor(stem, day)
             * self.forex.to_usd(currency, day)
         )
-
-    def overnight_maintenance_stock(self, ric, day):
-        currency = self.forex.get_stock_currency(ric)
-        if not self.market_data.is_trading_day(day, ric):
-            return 0
-        row = self.market_data.bardata(day, ric)
-        return row["CLOSE"][0] / 2 * self.forex.to_usd(currency, day)
 
 
 if __name__ == "__main__":

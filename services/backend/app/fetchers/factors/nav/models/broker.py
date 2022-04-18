@@ -25,14 +25,6 @@ class Broker:
     ):
         self.positions = {
             "Cash": {
-                "AUD": 0,
-                "CAD": 0,
-                "CHF": 0,
-                "EUR": 0,
-                "GBP": 0,
-                "HKD": 0,
-                "JPY": 0,
-                "SGD": 0,
                 "USD": cash,
             },
             FUTURE_TYPE: {},
@@ -81,12 +73,14 @@ class Broker:
             return
         stem = ric_to_stem(ric)
         currency = FUTURES[stem]["Currency"]
+        if currency not in self.positions["Cash"]:
+            self.positions["Cash"][currency] = 0
         if np.isnan(self.positions["Cash"][currency]):
             raise ValueError("Cash is nan.", ric, self.day)
         row = self.market_data.bardata(ric=ric, day=self.day)
-        if np.isnan(row.CLOSE[0]):
+        if np.isnan(row.Close[0]):
             raise ValueError("Close is nan.", ric, self.day)
-        execution_price = row.CLOSE[0]
+        execution_price = row.Close[0]
         self.positions[FUTURE_TYPE][ric] = (
             self.positions[FUTURE_TYPE].get(ric, 0) + contract_number
         )
@@ -148,24 +142,26 @@ class Broker:
             raise Exception(f"Maintenance margin exceeded {self.day.isoformat()}")
 
     def expire_future(self, ric):
-        df, _ = get_future_ohlcv_for_day(day=self.day, ric=ric)
+        dfm, _ = get_future_ohlcv_for_day(day=self.day, ric=ric)
         execution_price = (
-            df.CLOSE[0]
-            if not np.isnan(df.CLOSE[0])
-            else np.nanmedian(df[["OPEN", "HIGH", "LOW"]])
+            dfm.Close[0]
+            if not np.isnan(dfm.Close[0])
+            else np.nanmedian(dfm[["Open", "High", "Low"]])
         )
         return self.close_future(ric, execution_price)
 
     def close_future(self, ric, execution_price=None):
         stem = ric_to_stem(ric)
         currency = FUTURES[stem]["Currency"]
+        if currency not in self.positions["Cash"]:
+            self.positions["Cash"][currency] = 0
         if np.isnan(self.positions["Cash"][currency]):
             raise ValueError("Cash is nan.", ric, self.day)
         if execution_price is None:
             row = self.market_data.bardata(ric=ric, day=self.day)
-            if np.isnan(row.CLOSE[0]):
+            if np.isnan(row.Close[0]):
                 raise ValueError("Close is nan.", ric, self.day)
-            execution_price = row.CLOSE[0]
+            execution_price = row.Close[0]
         contract_number = self.positions[FUTURE_TYPE].get(ric, 0)
         self.positions[FUTURE_TYPE][ric] = (
             self.positions[FUTURE_TYPE].get(ric, 0) - contract_number
@@ -212,7 +208,7 @@ class Broker:
                 continue
             if self.market_data.is_trading_day(ric=ric, day=self.day):
                 row = self.market_data.bardata(ric=ric, day=self.day)
-                close = row.CLOSE[0]
+                close = row.Close[0]
                 self.previous_close[ric] = close
             else:
                 close = self.previous_close.get(ric, np.NaN)

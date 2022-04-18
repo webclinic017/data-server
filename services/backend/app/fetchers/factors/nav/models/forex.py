@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -48,14 +48,8 @@ client = Client()
 
 
 @ring.lru()
-def get_forex_ohlcv_for_day(day, ric):
-    start_date = date(day.year, 1, 1)
-    end_date = date(day.year, 12, 31)
-    dfm = client.get_daily_ohlcv(ric, start_date, end_date)
-    index = pd.to_datetime(dfm.index, format="%Y-%m-%d").get_loc(
-        datetime.combine(day, datetime.min.time()), method="nearest"
-    )
-    return dfm.iloc[index, :]
+def get_forex_ohlcv(ric, start_date, end_date):
+    return client.get_daily_ohlcv(ric, start_date, end_date)
 
 
 class Forex:
@@ -65,39 +59,45 @@ class Forex:
         if currency != "USD":
             day = bar.index[0]
             rate = Forex.to_usd(currency, day)
-            columns = ["OPEN", "HIGH", "LOW", "CLOSE"]
+            columns = ["Open", "High", "Low", "Close"]
             bar.loc[:, columns] = bar.loc[:, columns] * rate
-            bar.loc[:, "VOLUME"] = bar.loc[:, "VOLUME"] / rate
+            bar.loc[:, "Volume"] = bar.loc[:, "Volume"] / rate
         return bar
 
     @ring.lru()
     @staticmethod
     def to_usd(currency, day):
         if currency == "AUD":
-            return Forex.get_pair(day, "audusd", "USDAUD=R", invert=True)
+            return Forex.get_pair(day, "USDAUD=R", invert=True)
         elif currency == "CAD":
-            return Forex.get_pair(day, "cadusd", "CADUSD=R")
+            return Forex.get_pair(day, "CADUSD=R")
         elif currency == "CHF":
-            return Forex.get_pair(day, "chfusd", "CHFUSD=R")
+            return Forex.get_pair(day, "CHFUSD=R")
         elif currency == "EUR":
-            return Forex.get_pair(day, "eurusd", "USDEUR=R", invert=True)
+            return Forex.get_pair(day, "USDEUR=R", invert=True)
         elif currency == "GBP":
-            return Forex.get_pair(day, "gbpusd", "USDGBP=R", invert=True)
+            return Forex.get_pair(day, "USDGBP=R", invert=True)
         elif currency == "HKD":
-            return Forex.get_pair(day, "hkdusd", "HKDUSD=R")
+            return Forex.get_pair(day, "HKDUSD=R")
         elif currency == "JPY":
-            return Forex.get_pair(day, "jpyusd", "JPYUSD=R")
+            return Forex.get_pair(day, "JPYUSD=R")
         elif currency == "USD":
             return 1
         elif currency == "SGD":
-            return Forex.get_pair(day, "sgdusd", "SGDUSD=R")
+            return Forex.get_pair(day, "SGDUSD=R")
         return np.NaN
 
     @ring.lru()
     @staticmethod
-    def get_pair(day, pair, ric, invert=False):
-        df = get_forex_ohlcv_for_day(day, ric)
-        return 1 / df.CLOSE if invert else df.CLOSE
+    def get_pair(day, ric, invert=False):
+        start_date = date(day.year, 1, 1)
+        end_date = date(day.year, 12, 31)
+        dfm = get_forex_ohlcv(ric, start_date, end_date)
+        index = pd.to_datetime(
+            dfm.index.map(lambda x: x[0]), format="%Y-%m-%d"
+        ).get_loc(datetime.combine(day, datetime.min.time()), method="nearest")
+        dfm = dfm.iloc[index, :]
+        return 1 / dfm.Close if invert else dfm.Close
 
     @staticmethod
     def get_stock_currency(ric):

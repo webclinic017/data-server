@@ -40,7 +40,6 @@ class Client:
             },
         )
         response_json = response.json()
-        print(response_json)
         error = response_json["error"]
         if error is not None:
             print(error)

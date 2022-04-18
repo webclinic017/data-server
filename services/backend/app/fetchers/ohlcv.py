@@ -15,16 +15,11 @@ def ohlcv(ric, start_date, end_date):
     dfm, error_message = ohlcv__raw(ric, start_date, end_date)
     if error_message is not None:
         return None, error_message
-    dfm = dfm[["OPEN", "HIGH", "LOW", "CLOSE", "VOLUME"]]
-    dfm = dfm.rename(
-        columns={
-            "OPEN": "Open",
-            "HIGH": "High",
-            "LOW": "Low",
-            "CLOSE": "Close",
-            "VOLUME": "Volume",
-        }
-    )
+    columns = ["OPEN", "HIGH", "LOW", "CLOSE", "VOLUME"]
+    for col in list(set(columns) - set(dfm.columns)):
+        dfm[col] = None
+    dfm = dfm[columns]
+    dfm = dfm.rename(columns={col: col.title() for col in columns})
     arrays = [dfm.index, [ric] * len(dfm)]
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=["Date", "RIC"])

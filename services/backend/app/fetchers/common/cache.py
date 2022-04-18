@@ -203,18 +203,18 @@ def cache_in_s3(bucket_name, json_data_to_df):
                             + relativedelta(months=1)
                             - timedelta(days=1)
                         )
-                        r = func(ric, month_start_date, month_end_date)
-                        error_message = save_in_s3(r, bucket_name, object_name)
+                        response = func(ric, month_start_date, month_end_date)
+                        error_message = save_in_s3(response, bucket_name, object_name)
                         if error_message is None:
-                            data, _ = r["data"], r["error"]
-                            df = json_data_to_df(data)
+                            data, _ = response["data"], response["error"]
+                            dfm = json_data_to_df(data)
                         else:
                             return None, error_message
                     else:
                         data, _ = download_from_s3(bucket_name, object_name)
-                        df = json_data_to_df(data)
-                    if df.shape[0] > 0:
-                        frames.append(df)
+                        dfm = json_data_to_df(data)
+                    if dfm.shape[0] > 0:
+                        frames.append(dfm)
             if len(frames) == 0:
                 return None, "No data"
             dfm = safe_concat(frames)

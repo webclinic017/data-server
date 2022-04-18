@@ -41,7 +41,7 @@ class BuyAndHoldBacktester(Backtester):
             else:
                 position = self.broker.positions[FUTURE_TYPE].get(front_ric, 0)
                 row = self.market_data.bardata(ric=front_ric, day=self.day)
-                close = row["CLOSE"][0]
+                close = row["Close"][0]
                 if position == 0:
                     full_point_value = FUTURES[stem]["FullPointValue"]
                     currency = FUTURES[stem]["Currency"]
