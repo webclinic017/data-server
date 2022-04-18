@@ -4,19 +4,19 @@ import os
 from fastapi import FastAPI, HTTPException, Depends, Request
 import numpy as np
 
-from .data_providers.common.constants import FUTURES
-from .data_providers.common.eikon import get_data
-from .data_providers.factors.carry_bond import factor_carry_bond
-from .data_providers.factors.carry_commodity import factor_carry_commodity
-from .data_providers.factors.carry_currency import factor_carry_currency
-from .data_providers.factors.carry_equity import factor_carry_equity
-from .data_providers.factors.cot import factor_cot
-from .data_providers.factors.currency import factor_currency
-from .data_providers.factors.nav import factor_nav_long, factor_nav_short
-from .data_providers.factors.roll_return import factor_roll_return
-from .data_providers.factors.splits import factor_splits
-from .data_providers.ohlcv import ohlcv
-from .data_providers.risk_free_rate import risk_free_rate
+from .fetchers.common.constants import FUTURES
+from .fetchers.common.eikon import get_data
+from .fetchers.factors.carry_bond import factor_carry_bond
+from .fetchers.factors.carry_commodity import factor_carry_commodity
+from .fetchers.factors.carry_currency import factor_carry_currency
+from .fetchers.factors.carry_equity import factor_carry_equity
+from .fetchers.factors.cot import factor_cot
+from .fetchers.factors.currency import factor_currency
+from .fetchers.factors.nav import factor_nav_long, factor_nav_short
+from .fetchers.factors.roll_return import factor_roll_return
+from .fetchers.factors.splits import factor_splits
+from .fetchers.ohlcv import ohlcv
+from .fetchers.risk_free_rate import risk_free_rate
 
 
 DATA_SECRET_KEY = os.getenv("DATA_SECRET_KEY")
