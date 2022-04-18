@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI, HTTPException, Depends, Request
 import numpy as np
 
+from .fetchers.clean import clean
 from .fetchers.common.constants import FUTURES
 from .fetchers.expiry_calendar import expiry_calendar
 from .fetchers.factors.carry_bond import factor_carry_bond
@@ -40,6 +41,12 @@ def verify_token(req: Request):
     if token != DATA_SECRET_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
     return True
+
+
+@app.get("/clean")
+def handler_clean(bucket_name: str, authorized: bool = Depends(verify_token)):
+    clean(bucket_name)
+    return {"data": "OK", "error": None}
 
 
 @catch_errors
