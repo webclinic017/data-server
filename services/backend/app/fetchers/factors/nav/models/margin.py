@@ -4,11 +4,11 @@ import numpy as np
 from .forex import Forex
 from .market_data import MarketData
 from ..utils.contract import get_front_contract
-from ....common.constants import FUTURES, FUTURE_TYPE
+from ....common.constants import FUTURES
 
 
 class Margin:
-    def __init__(self, instrument_type=FUTURE_TYPE):
+    def __init__(self):
         self.cache = {}
         self.forex = Forex()
         self.market_data = MarketData()

@@ -3,8 +3,8 @@ import json
 import os
 
 script_path = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(script_path, "database-futures.json"), "r") as f:
-    FUTURES = json.load(f)
+with open(os.path.join(script_path, "database-futures.json"), "r") as handler:
+    FUTURES = json.load(handler)
 
 FUTURE_TYPE = "future"
 

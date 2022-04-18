@@ -1,5 +1,4 @@
 from datetime import date, datetime, timedelta
-import pandas as pd
 
 from .common.cache import download_from_s3, save_in_s3
 from .common.eikon import get_data

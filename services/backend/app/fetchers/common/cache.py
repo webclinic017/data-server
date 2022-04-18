@@ -113,7 +113,7 @@ def json_data_to_df(data: dict, version="v1"):
                 "time_period_start": "Date",
             }
         )
-        dfm.loc[:, "Date"] = df.Date.apply(
+        dfm.loc[:, "Date"] = dfm.Date.apply(
             lambda x: datetime.strptime(x[:10], "%Y-%m-%d")
         )
         dfm = dfm[["Date", "OPEN", "HIGH", "LOW", "CLOSE", "VOLUME"]]
@@ -126,37 +126,38 @@ def safe_concat(frames, axis=0):
     return pd.concat(frames, axis=axis)
 
 
-def save_in_s3(r, bucket_name, object_name):
+def save_in_s3(response, bucket_name, object_name):
     too_many_requests = (
-        isinstance(r, dict)
-        and "data" in r
-        and r["data"] is None
-        and "error" in r
-        and r["error"] is None
+        isinstance(response, dict)
+        and "data" in response
+        and response["data"] is None
+        and "error" in response
+        and response["error"] is None
     )
     if too_many_requests:
         return TOO_MANY_REQUESTS
     eikon_not_running = (
-        isinstance(r, dict)
-        and "data" in r
-        and r["data"] is None
-        and "error" in r
-        and r["error"] is not None
-        and "Eikon Proxy not running or cannot be reached." in r["error"]["message"]
+        isinstance(response, dict)
+        and "data" in response
+        and response["data"] is None
+        and "error" in response
+        and response["error"] is not None
+        and "Eikon Proxy not running or cannot be reached."
+        in response["error"]["message"]
     )
     if eikon_not_running:
         return EIKON_NOT_RUNNING
     temp_dir = tempfile.TemporaryDirectory()
     path = os.path.join(temp_dir.name, object_name)
-    with open(ensure_dir(path), "w") as f:
-        json.dump(r, f)
+    with open(ensure_dir(path), "w") as handler:
+        json.dump(response, handler)
     make_bucket_if_not_exists(bucket_name)
     print(f"Downloading {object_name}")
     put_object(path, bucket_name, object_name)
     temp_dir.cleanup()
 
 
-def cache_in_s3(bucket_name, json_data_to_df):
+def cache_in_s3(bucket_name, formatter):
     """
     Parameters:
     -----------
@@ -207,12 +208,12 @@ def cache_in_s3(bucket_name, json_data_to_df):
                         error_message = save_in_s3(response, bucket_name, object_name)
                         if error_message is None:
                             data, _ = response["data"], response["error"]
-                            dfm = json_data_to_df(data)
+                            dfm = formatter(data)
                         else:
                             return None, error_message
                     else:
                         data, _ = download_from_s3(bucket_name, object_name)
-                        dfm = json_data_to_df(data)
+                        dfm = formatter(data)
                     if dfm.shape[0] > 0:
                         frames.append(dfm)
             if len(frames) == 0:

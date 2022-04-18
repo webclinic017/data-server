@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta
+import tempfile
 
 import pandas as pd
 import ring
-import tempfile
 
 from ....common.client import Client
 from ....common.constants import FUTURES, START_DATE
@@ -134,8 +134,8 @@ def get_chain(stem, day=START_DATE, minimum_time_to_expiry=0):
         raise Exception(
             f"Not enough data for {stem}. Download expiry data from {source}"
         )
-    index = (dfm.LTD >= day.isoformat()) & (dfm.WeTrd == 1)
-    return dfm.loc[index, :].reset_index(drop=True)
+    index = (dfm.LTD >= day.isoformat()) & (dfm.WeTrd == 1)  # pylint: disable=no-member
+    return dfm.loc[index, :].reset_index(drop=True)  # pylint: disable=no-member
 
 
 def get_expiry_calendar(stem):

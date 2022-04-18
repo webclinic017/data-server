@@ -7,7 +7,7 @@ import quandl as qdl
 
 from ..common.cache import download_from_s3, json_data_to_df
 from ..common.constants import FUTURES
-from ..common.minio import exists_object, fget_object, put_object
+from ..common.minio import exists_object, put_object
 
 
 # What are the different COT types
@@ -25,10 +25,10 @@ qdl.ApiConfig.api_key = os.getenv("QUANDL_API_KEY")
 def download_commitment_of_traders(stem, cot_type="F"):
     if cot_type in COT_TYPES:
         qdl_code = FUTURES[stem]["COT"]
-        df = qdl.get("CFTC/{}_{}_ALL".format(qdl_code, cot_type))
+        dfm = qdl.get("CFTC/{}_{}_ALL".format(qdl_code, cot_type))
     else:
         raise Exception("COT Type {} not defined!".format(cot_type))
-    return df
+    return dfm
 
 
 def get_commitment_of_traders(stem, cot_type="F"):
@@ -60,8 +60,8 @@ def get_commitment_of_traders(stem, cot_type="F"):
     response = {"data": data, "error": {}}
     temp_dir = tempfile.TemporaryDirectory()
     path = os.path.join(temp_dir.name, object_name)
-    with open(path, "w") as f:
-        json.dump(response, f)
+    with open(path, "w") as handler:
+        json.dump(response, handler)
     put_object(path, bucket_name)
     temp_dir.cleanup()
     return json_data_to_df(data, version="v1")

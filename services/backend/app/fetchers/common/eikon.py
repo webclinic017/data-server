@@ -1,10 +1,10 @@
 import json
 import os
+import urllib.parse
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
-import urllib.parse
 
 
 EIKON_BASE_URL = "https://" + os.getenv("EIKON_DOMAIN") + ":8000"
@@ -42,12 +42,12 @@ def get_data(
         "debug": debug,
     }
     headers = {"Authorization": EIKON_SECRET_KEY}
-    r = http.get(
+    response = http.get(
         f"{EIKON_BASE_URL}/data/{instruments}/{fields}/",
         headers=headers,
         params=payload,
     )
-    return r.json()
+    return response.json()
 
 
 def get_news_headlines(
@@ -67,17 +67,19 @@ def get_news_headlines(
         "debug": debug,
     }
     headers = {"Authorization": EIKON_SECRET_KEY}
-    r = http.get(f"{EIKON_BASE_URL}/news_headlines/", headers=headers, params=payload)
-    return r.json()
+    response = http.get(
+        f"{EIKON_BASE_URL}/news_headlines/", headers=headers, params=payload
+    )
+    return response.json()
 
 
 def get_news_story(story_id, raw_output: bool = False, debug: bool = False):
     payload = {"raw_output": raw_output, "debug": debug}
     headers = {"Authorization": EIKON_SECRET_KEY}
-    r = http.get(
+    response = http.get(
         f"{EIKON_BASE_URL}/news_story/{story_id}/", headers=headers, params=payload
     )
-    return r.json()
+    return response.json()
 
 
 def get_symbology(
@@ -86,20 +88,20 @@ def get_symbology(
     to_symbol_type=None,
     raw_output: bool = False,
     debug: bool = False,
-    bestMatch: bool = True,
+    best_match: bool = True,
 ):
     payload = {
         "from_symbol_type": from_symbol_type,
         "to_symbol_type": to_symbol_type,
         "raw_output": raw_output,
         "debug": debug,
-        "bestMatch": bestMatch,
+        "best_match": best_match,
     }
     headers = {"Authorization": EIKON_SECRET_KEY}
-    r = http.get(
+    response = http.get(
         f"{EIKON_BASE_URL}/symbology/{symbol}/", headers=headers, params=payload
     )
-    return r.json()
+    return response.json()
 
 
 def get_timeseries(
@@ -132,7 +134,7 @@ def get_timeseries(
         "debug": debug,
     }
     headers = {"Authorization": EIKON_SECRET_KEY}
-    r = http.get(
+    response = http.get(
         f"{EIKON_BASE_URL}/timeseries/{rics}/", headers=headers, params=payload
     )
-    return r.json()
+    return response.json()

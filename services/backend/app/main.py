@@ -30,8 +30,8 @@ def catch_errors(func):
     def decorator(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exception as e:
-            return {"data": None, "error": str(e)}
+        except Exception as exception:  # pylint: disable=broad-except
+            return {"data": None, "error": str(exception)}
 
     return decorator
 
@@ -44,7 +44,10 @@ def verify_token(req: Request):
 
 
 @app.get("/clean")
-def handler_clean(bucket_name: str, authorized: bool = Depends(verify_token)):
+def handler_clean(
+    bucket_name: str,
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
+):
     clean(bucket_name)
     return {"data": "OK", "error": None}
 
@@ -72,7 +75,7 @@ def handler_daily_factor_carry_bond(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_carry_bond(ticker, start_date, end_date)
 
@@ -100,7 +103,7 @@ def handler_daily_factor_carry_commodity(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_carry_commodity(ticker, start_date, end_date)
 
@@ -128,7 +131,7 @@ def handler_daily_factor_carry_currency(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_carry_currency(ticker, start_date, end_date)
 
@@ -156,7 +159,7 @@ def handler_daily_factor_carry_equity(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_carry_equity(ticker, start_date, end_date)
 
@@ -184,7 +187,7 @@ def handler_daily_factor_cot(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_cot(ticker, start_date, end_date)
 
@@ -212,7 +215,7 @@ def handler_daily_factor_currency(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_currency(ticker, start_date, end_date)
 
@@ -222,7 +225,7 @@ def handler_daily_factor_nav_long(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     dfm, error_message = factor_nav_long(
         future=FUTURES.get(ticker),
@@ -245,7 +248,7 @@ def handler_daily_factor_nav_short(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     dfm, error_message = factor_nav_short(
         future=FUTURES.get(ticker),
@@ -268,17 +271,17 @@ def handler_daily_factor_news_headlines(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return {"data": None, "error": None}
 
 
 @app.get("/daily/factor/news/stories")
-def handler_daily_factor_news_headlines(
+def handler_daily_factor_news_stories(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return {"data": None, "error": None}
 
@@ -306,7 +309,7 @@ def handler_daily_factor_roll_return(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_roll_return(ticker, start_date, end_date)
 
@@ -334,7 +337,7 @@ def handler_daily_splits(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_factor_splits(ticker, start_date, end_date)
 
@@ -359,7 +362,10 @@ def daily_ohlcv(ric: str, start_date: str, end_date: str):
 
 @app.get("/daily/ohlcv")
 def handler_daily_ohlcv(
-    ric: str, start_date: str, end_date: str, authorized: bool = Depends(verify_token)
+    ric: str,
+    start_date: str,
+    end_date: str,
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_ohlcv(ric, start_date, end_date)
 
@@ -384,14 +390,10 @@ def daily_risk_free_rate(ric: str, start_date: str, end_date: str):
 
 @app.get("/daily/risk-free-rate")
 def handler_daily_risk_free_rate(
-    ric: str, start_date: str, end_date: str, authorized: bool = Depends(verify_token)
-):
-    return daily_risk_free_rate(ric, start_date, end_date)
-
-
-@app.get("/daily/risk-free-rate")
-def handler_daily_risk_free_rate(
-    ric: str, start_date: str, end_date: str, authorized: bool = Depends(verify_token)
+    ric: str,
+    start_date: str,
+    end_date: str,
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     return daily_risk_free_rate(ric, start_date, end_date)
 
@@ -401,7 +403,7 @@ def handler_expiry_calendar(
     ticker: str,
     start_date: str,
     end_date: str,
-    authorized: bool = Depends(verify_token),
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
 ):
     data, error_message = expiry_calendar(
         ticker=ticker,
@@ -417,10 +419,15 @@ def handler_health():
 
 
 @app.get("/health/ric")
-def handler_health_ric(ric: str, authorized: bool = Depends(verify_token)):
+def handler_health_ric(
+    ric: str,
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
+):
     return health_ric(ric)
 
 
 @app.get("/tickers")
-def handler_tickers(authorized: bool = Depends(verify_token)):
+def handler_tickers(
+    authorized: bool = Depends(verify_token),  # pylint: disable=unused-argument
+):
     return {"data": FUTURES, "error": None}

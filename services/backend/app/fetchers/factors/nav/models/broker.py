@@ -41,10 +41,8 @@ class Broker:
         self.no_check = no_check
 
     def apply_adjustment(self, adjustment_ratio):
-        for key in self.positions.keys():
-            self.positions[key] = {
-                k: v * adjustment_ratio for k, v in self.positions[key].items()
-            }
+        for key, value in self.positions.items():
+            self.positions[key] = {k: v * adjustment_ratio for k, v in value.items()}
 
     def apply_commission(self, contract_number):
         commission = -np.abs(contract_number) * COMMISSION_INTERACTIVE_BROKERS_USD
@@ -125,7 +123,8 @@ class Broker:
             total_required_margin += np.abs(_contract_number) * margin
         if total_required_margin > self.nav:
             raise Exception(
-                f"Initial margin exceeded {self.day.isoformat()} {ric} {contract_number} {total_required_margin} {self.nav}"
+                f"Initial margin exceeded {self.day.isoformat()} {ric}"
+                + f" {contract_number} {total_required_margin} {self.nav}"
             )
 
     def check_maintenance_margin(self):

@@ -73,13 +73,13 @@ class MarketData:
             return False
         try:
             row = MarketData.bardata(day=day, ric=ric)
-        except Exception as e:
-            message = str(e)
+        except Exception as exception:
+            message = str(exception)
             if "No OHLCV for" in message:
                 return False
             elif "[not-started]" in message:
                 return False
-            raise e
+            raise exception
         return not np.isnan(row.Close[0])
 
     def should_roll_today(self, day, stem):

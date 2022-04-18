@@ -17,6 +17,7 @@ def business_conditions(future, start_date, end_date):
     tuples = list(zip(*arrays))
     dfm.index = pd.MultiIndex.from_tuples(tuples, names=["Date", "Stem"])
     shift_period = -int(window_short / 2)
+    # pylint: disable=no-member
     dfm[column] = np.sign(
         dfm.CLOSE.shift(shift_period).rolling(window=window_short).mean()
         - dfm.CLOSE.shift(shift_period).rolling(window=window_long).mean()

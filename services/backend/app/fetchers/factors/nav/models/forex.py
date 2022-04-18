@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 import numpy as np
 import pandas as pd
@@ -54,15 +54,15 @@ def get_forex_ohlcv(ric, start_date, end_date):
 
 class Forex:
     @staticmethod
-    def bar_to_usd(bar, stem):
+    def bar_to_usd(bardata, stem):
         currency = FUTURES[stem]["Currency"]
         if currency != "USD":
-            day = bar.index[0]
+            day = bardata.index[0]
             rate = Forex.to_usd(currency, day)
             columns = ["Open", "High", "Low", "Close"]
-            bar.loc[:, columns] = bar.loc[:, columns] * rate
-            bar.loc[:, "Volume"] = bar.loc[:, "Volume"] / rate
-        return bar
+            bardata.loc[:, columns] = bardata.loc[:, columns] * rate
+            bardata.loc[:, "Volume"] = bardata.loc[:, "Volume"] / rate
+        return bardata
 
     @ring.lru()
     @staticmethod
@@ -113,9 +113,3 @@ class Forex:
             ]
             assert len(currencies) == 1
             return currencies[0]
-
-
-if __name__ == "__main__":
-    day = date(2001, 1, 4)
-    forex = Forex()
-    print(forex.to_usd("AUD", day))

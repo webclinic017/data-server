@@ -29,7 +29,7 @@ def exists_object(bucket_name, object_name):
     try:
         client.stat_object(bucket_name, object_name)
         return True
-    except:
+    except:  # pylint: disable=bare-except
         return False
 
 
@@ -66,12 +66,3 @@ def remove_object(bucket_name, object_name):
 
 def stat_object(bucket_name, object_name):
     return client.stat_object(bucket_name, object_name)
-
-
-if __name__ == "__main__":
-    from datetime import date
-
-    BUCKET_NAME = "daily-ohlcv"
-    for obj in client.list_objects(BUCKET_NAME):
-        if obj.last_modified.date() == date.today():
-            remove_object(BUCKET_NAME, object_name=obj.object_name)

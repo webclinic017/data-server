@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta
+import time
 
 import pandas as pd
 import ring
-import time
 from tqdm import tqdm
 
 from .common.constants import FUTURES, LETTERS

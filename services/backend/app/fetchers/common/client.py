@@ -31,7 +31,7 @@ class Client:
 
     def get_daily_ohlcv(self, ric, start_date, end_date):
         response = requests.get(
-            f"http://localhost:8000/daily/ohlcv",
+            "http://localhost:8000/daily/ohlcv",
             headers=self.headers,
             params={
                 "ric": ric,
@@ -52,7 +52,7 @@ class Client:
 
     def get_daily_risk_free_rate(self, ric, start_date, end_date):
         response = requests.get(
-            f"http://localhost:8000/daily/risk-free-rate",
+            "http://localhost:8000/daily/risk-free-rate",
             headers=self.headers,
             params={
                 "ric": ric,
@@ -73,7 +73,7 @@ class Client:
 
     def get_health_ric(self, ric):
         response = requests.get(
-            f"http://localhost:8000/health/ric",
+            "http://localhost:8000/health/ric",
             headers=self.headers,
             params={
                 "ric": ric,
@@ -83,6 +83,6 @@ class Client:
         return data
 
     def get_tickers(self):
-        response = requests.get(f"http://localhost:8000/tickers", headers=self.headers)
+        response = requests.get("http://localhost:8000/tickers", headers=self.headers)
         data = response.json().get("data", [])
         return data
