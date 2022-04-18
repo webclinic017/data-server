@@ -2,5 +2,7 @@ fastapi
 numpy
 pandas
 python-dateutil
+quandl
+ring
 tqdm
 uvicorn
