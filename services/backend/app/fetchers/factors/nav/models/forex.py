@@ -92,7 +92,7 @@ class Forex:
     def get_pair(day, ric, invert=False):
         start_date = date(day.year, 1, 1)
         end_date = date(day.year, 12, 31)
-        dfm = get_forex_ohlcv(ric, start_date, end_date)
+        dfm, _ = get_forex_ohlcv(ric, start_date, end_date)
         index = pd.to_datetime(
             dfm.index.map(lambda x: x[0]), format="%Y-%m-%d"
         ).get_loc(datetime.combine(day, datetime.min.time()), method="nearest")

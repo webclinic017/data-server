@@ -20,14 +20,12 @@ class Client:
         )
         response_json = response.json()
         error = response_json["error"]
-        if error is not None:
-            print(error)
         data = response_json["data"]
         if data is None:
-            return
+            return None, error
         dfm = pd.DataFrame.from_dict(data)
         dfm = dfm.set_index(["Date", "Stem"])
-        return dfm
+        return dfm, error
 
     def get_daily_ohlcv(self, ric, start_date, end_date):
         response = requests.get(
@@ -41,14 +39,12 @@ class Client:
         )
         response_json = response.json()
         error = response_json["error"]
-        if error is not None:
-            print(error)
         data = response_json["data"]
         if data is None:
-            return
+            return None, error
         dfm = pd.DataFrame.from_dict(data)
         dfm = dfm.set_index(["Date", "RIC"])
-        return dfm
+        return dfm, error
 
     def get_daily_risk_free_rate(self, ric, start_date, end_date):
         response = requests.get(
@@ -84,5 +80,7 @@ class Client:
 
     def get_tickers(self):
         response = requests.get("http://localhost:8000/tickers", headers=self.headers)
-        data = response.json().get("data", [])
-        return data
+        response_json = response.json()
+        data = response_json.get("data", [])
+        error = response_json["error"]
+        return data, error

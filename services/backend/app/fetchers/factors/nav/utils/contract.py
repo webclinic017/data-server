@@ -130,16 +130,12 @@ def get_chain(stem, day=START_DATE, minimum_time_to_expiry=0):
     if datetime.strptime(dfm.LTD.iloc[-1], "%Y-%m-%d").date() - day < timedelta(
         days=minimum_time_to_expiry
     ):
-        source = get_expiry_calendar(stem)
+        expiry_calendar = FUTURES.get(stem, {}).get("ExpiryCalendar", "")
         raise Exception(
-            f"Not enough data for {stem}. Download expiry data from {source}"
+            f"Not enough data for {stem}. Download expiry data from {expiry_calendar}"
         )
     index = (dfm.LTD >= day.isoformat()) & (dfm.WeTrd == 1)  # pylint: disable=no-member
     return dfm.loc[index, :].reset_index(drop=True)  # pylint: disable=no-member
-
-
-def get_expiry_calendar(stem):
-    return FUTURES.get(stem, {}).get("ExpiryCalendar", "")
 
 
 @ring.lru()

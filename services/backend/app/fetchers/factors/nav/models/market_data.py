@@ -23,12 +23,14 @@ client = Client()
 
 @ring.lru()
 def get_future_ohlcv(ric, start_date, end_date):
-    dfm = client.get_daily_ohlcv(ric, start_date, end_date)
+    dfm, error = client.get_daily_ohlcv(ric, start_date, end_date)
+    if dfm is None:
+        return None, error
     dfm.reset_index(drop=False, inplace=True)
     dfm.Date = dfm.Date.apply(lambda x: x[:10])
     dfm.drop(columns=["RIC"], inplace=True)
     dfm.set_index("Date", drop=True, inplace=True)
-    return dfm
+    return dfm, error
 
 
 def get_future_ohlcv_for_day(day, ric=None):
@@ -42,7 +44,7 @@ def get_future_ohlcv_for_day(day, ric=None):
     ):
         message = f"No OHLCV for {ric} on {day.isoformat()}"
         return None, {"message": message}
-    dfm = get_future_ohlcv(ric, first_trade_date, last_trade_date)
+    dfm, _ = get_future_ohlcv(ric, first_trade_date, last_trade_date)
     if dfm is not None:
         index = dfm.index == day.isoformat()
         current_day_exists = np.any(index)
