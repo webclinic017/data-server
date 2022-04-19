@@ -49,11 +49,3 @@ class Margin:
             * self.adjustment_factor(stem, day)
             * self.forex.to_usd(currency, day)
         )
-
-
-if __name__ == "__main__":
-    margin = Margin()
-    print(margin.overnight_initial_future("ES", date(2018, 7, 2)))
-    print(margin.overnight_maintenance_future("ES", date(2018, 7, 2)))
-    print(margin.overnight_initial_future("GC", date(2004, 1, 2)))
-    print(margin.overnight_maintenance_future("GC", date(2004, 1, 2)))

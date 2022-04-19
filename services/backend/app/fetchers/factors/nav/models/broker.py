@@ -35,7 +35,7 @@ class Broker:
         self.forex = Forex()
         self.has_execution = False
         self.live = live
-        self.margin = Margin(instrument_type=FUTURE_TYPE)
+        self.margin = Margin()
         self.market_data = MarketData()
         self.market_impact = MarketImpact()
         self.no_check = no_check
